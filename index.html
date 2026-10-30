@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Check-in">
+<meta name="theme-color" content="#2C7A82">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icon-180.png">
+<title>Daily check-in</title>
+<style>
+:root{--bg:#EEF3F4;--card:#FFFFFF;--ink:#1D2B33;--mute:#5E7078;--line:#D4DFE2;--acc:#2C7A82;--accsoft:#DCEEF0;--warn:#B8741F;--warnsoft:#F6E9D6;--bad:#B3392F;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#121A1E;--card:#1B262B;--ink:#E6EEF0;--mute:#93A7AE;--line:#2D3C42;--acc:#59B7BF;--accsoft:#1F3A3F;--warn:#E3A55A;--warnsoft:#3A2D1B;--bad:#E8786E;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#121A1E;--card:#1B262B;--ink:#E6EEF0;--mute:#93A7AE;--line:#2D3C42;--acc:#59B7BF;--accsoft:#1F3A3F;--warn:#E3A55A;--warnsoft:#3A2D1B;--bad:#E8786E;color-scheme:dark}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:17px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+body.locked main{display:none}
+main{max-width:560px;margin:0 auto;padding:14px 14px 48px}
+h1{font-size:20px;margin:0 0 8px}
+a{color:var(--acc)}
+#tb{display:flex;gap:6px;margin:0 0 12px;overflow-x:auto}
+#tb button{flex:1 0 auto;padding:0 12px;height:42px;border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:10px;font:inherit;cursor:pointer}
+#tb button.on{background:var(--acc);color:#fff;border-color:var(--acc);font-weight:700}
+.dn{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.date{flex:1;text-align:center;font-weight:700}
+.nb{background:var(--card);border:1px solid var(--line);color:var(--ink);border-radius:10px;width:44px;height:44px;font-size:20px;cursor:pointer}.nb:disabled{opacity:.35}
+.prog,.note,.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px 14px;margin:0 0 14px}
+.note{background:var(--warnsoft);border-color:transparent;display:flex;gap:10px;align-items:center;justify-content:space-between}
+.card.acc{background:var(--accsoft);border-color:transparent}
+.bar{height:8px;background:var(--line);border-radius:8px;overflow:hidden;margin:8px 0 12px}
+.bar i{display:block;height:100%;background:var(--acc);width:0;transition:width .25s}
+.week{display:flex;gap:6px;align-items:flex-end;height:62px}
+.week div{flex:1;text-align:center;font-size:12px;color:var(--mute)}
+.week span{display:block;background:var(--accsoft);border-radius:4px;min-height:4px;margin-bottom:2px}
+.week .on span{background:var(--acc)}
+section{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:6px 14px 12px;margin-bottom:14px}
+h2{font-size:18px;margin:12px 0 4px;display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+h3{font-size:16px;margin:10px 0 4px}
+.row{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 0;border-top:1px solid var(--line)}
+section>.row:first-child{border-top:0}
+.col{display:block;padding:10px 0;border-top:1px solid var(--line)}
+section>.col:first-child{border-top:0}
+input[type=time],input[type=number],input[type=text],input[type=password],select,textarea{font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:9px 10px;max-width:100%}
+input[type=number]{width:96px}input[type=time]{width:124px}
+textarea,input.full{width:100%;margin-top:6px}
+textarea{min-height:56px;resize:vertical}
+input[type=checkbox]{width:26px;height:26px;accent-color:var(--acc);flex:none}
+.scale{display:flex;gap:6px;margin-top:8px}
+.scale button{width:44px;height:44px;border-radius:10px;border:1px solid var(--line);background:var(--bg);color:var(--ink);font:inherit;cursor:pointer}
+.scale button.on{background:var(--acc);border-color:var(--acc);color:#fff;font-weight:700}
+.hint{color:var(--mute);font-size:14px}
+.log{background:var(--warnsoft);border-radius:12px;padding:10px 12px;margin-top:8px;display:flex;justify-content:space-between;gap:8px}
+.log b{color:var(--warn)}
+.log button{background:none;border:0;color:var(--mute);font-size:20px;cursor:pointer}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.chip{background:var(--accsoft);border:0;color:var(--ink);border-radius:20px;padding:6px 12px;font:inherit;font-size:15px;cursor:pointer}
+.add{background:var(--acc);color:#fff;border:0;border-radius:10px;padding:12px 16px;font:inherit;font-weight:700;margin-top:8px;cursor:pointer}
+.sm{background:none;border:1px solid var(--line);color:var(--ink);border-radius:8px;min-width:36px;height:36px;padding:0 10px;font:inherit;cursor:pointer}
+.sm.del{color:var(--bad)}
+.hrow{display:flex;width:100%;justify-content:space-between;align-items:center;gap:10px;text-align:left;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:13px 14px;margin-bottom:8px;color:var(--ink);font:inherit;cursor:pointer}
+.tagd{font-size:12px;background:var(--accsoft);border-radius:8px;padding:2px 8px;margin-left:6px}
+.ed input[type=text]{flex:1;margin:0;min-width:0}
+.ed .tools{display:flex;gap:4px;flex:none}
+.tag{font-size:12px;color:var(--mute);flex:none;width:62px}
+.seg{display:flex;gap:6px;margin-bottom:12px}
+.seg button{flex:1;height:38px;border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:10px;font:inherit;cursor:pointer}
+.seg button.on{background:var(--accsoft);border-color:var(--acc);font-weight:700}
+.lock{position:fixed;inset:0;background:var(--bg);z-index:9;display:flex;align-items:center;justify-content:center;padding:20px;overflow:auto}
+.lock[hidden]{display:none}
+.lc{width:100%;max-width:320px;text-align:center}
+.fab{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(16px + env(safe-area-inset-bottom,0px));z-index:5;background:var(--ink);color:var(--bg);border:0;border-radius:24px;padding:13px 22px;font:inherit;font-weight:700;box-shadow:0 4px 14px rgba(0,0,0,.28);cursor:pointer}
+ul.pts{padding-left:20px;margin:6px 0}ul.pts li{margin-bottom:6px}
+button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible,a:focus-visible{outline:3px solid var(--acc);outline-offset:2px}
+footer{color:var(--mute);font-size:14px;text-align:center;margin-top:8px}
+</style>
+</head>
+<body>
+<div class="lock" id="su" hidden>
+ <div class="lc"><h2 style="justify-content:center">Protect your check-ins</h2><p class="hint">Choose a PIN so only you can open this app. You can change it later under More, then Edit.</p><label for="sp">PIN (4 to 6 digits)</label><input id="sp" class="full" type="password" inputmode="numeric" maxlength="6" autocomplete="off"><label for="sc">Confirm PIN</label><input id="sc" class="full" type="password" inputmode="numeric" maxlength="6" autocomplete="off"><div id="sbr" style="display:none;align-items:center;gap:10px;margin-top:12px;text-align:left"><input type="checkbox" id="sb"><label for="sb">Also unlock with Face ID or fingerprint</label></div><button class="add" id="ss">Set PIN</button><div class="hint" id="se" role="alert"></div><p><button class="sm" id="sk">Skip for now</button></p></div>
+</div>
+<div class="lock" id="lk" hidden>
+ <div class="lc"><h2 style="justify-content:center">Daily check-in</h2><button class="add" id="lb" style="display:none">Unlock with Face ID or fingerprint</button><br><label for="lp">Enter your PIN</label>
+ <input id="lp" class="full" type="password" inputmode="numeric" maxlength="6" autocomplete="off">
+ <button class="add" id="lu">Unlock</button><div class="hint" id="le" role="alert"></div>
+ <p><button class="sm" id="lf">Forgot PIN?</button></p></div>
+</div>
+<main>
+<h1>Daily check-in</h1>
+<nav id="tb" aria-label="Sections"></nav>
+<div id="app"></div>
+<footer>Saved on this device only. If you’re in crisis, call or text 988 (US) or contact your local emergency services.</footer>
+</main>
+<script>
+'use strict';
+const KEY='daily-checkin-v1',CK='daily-checkin-cfg-v3',MK='daily-checkin-meta-v1';
+const TIP_URL=''; // paste a tip link here (for example a Ko-fi or Buy Me a Coffee page)
+const TL={check:'Checkbox',time:'Time',num:'Number',text:'Note',scale:'1–5 scale',log:'Log',pick:'Dropdown list'};
+const LP=['What was it?','How strong (1–5)','What I did about it (optional)'];
+const INFO={
+gut:{t:'Food and mood',short:'Diets high in ultra-processed food are linked to more depression and anxiety in studies. That’s a link, not proof of cause.',
+ pts:['A 2022 review pooling observational studies found ultra-processed food intake linked with poorer mental health. In studies that followed people over time, higher intake went with about 22% higher risk of later depression.','Researchers suggest possible reasons such as inflammation, an imbalance of gut bacteria, missing nutrients and blood sugar swings. These are still being tested.','The authors say stronger studies are needed to show cause and effect. Logging snacks helps you spot your own patterns. It isn’t about being perfect.'],
+ src:[['Lane et al. 2022, Nutrients (systematic review)','https://www.ncbi.nlm.nih.gov/pmc/articles/PMC9268228/']]},
+five:{t:'Mood helpers: five ways to boost your day',short:'The NHS lists five evidence-informed steps: connect, be active, learn, give, be present. The helpers below cover several.',
+ pts:['NHS five steps: connect with other people, be physically active, learn new skills, give to others, and pay attention to the present moment.','Going outside, drinking enough water and keeping on top of chores are simple self-care habits that are easy to count. We haven’t linked a specific study for each one.','Exercise isn’t a cure for any condition, and low motivation is common when you feel low. Starting small counts.'],
+ src:[['NHS: 5 steps to mental wellbeing','https://www.nhs.uk/mental-health/self-help/guides-tools-and-activities/five-steps-to-mental-wellbeing/']]},
+mind:{t:'Mindfulness',short:'Mindfulness may help with anxiety, depression and recovery from substance use, and usually carries few risks.',
+ pts:['The US National Center for Complementary and Integrative Health says mindfulness-based practices may help anxiety and depression, may reduce insomnia, and may help people recover from substance use disorders.','It’s usually considered low risk, but some people have unpleasant experiences. If you have a mental or physical health condition, talk to your health care provider before starting.','Short guided practices of one to five minutes are a gentle way to begin.'],
+ src:[['NCCIH: 8 things to know about meditation and mindfulness','https://www.nccih.nih.gov/health/tips/8-things-to-know-about-meditation-and-mindfulness'],['NHS Lanarkshire: short mindfulness practices','https://www.nhslanarkshire.scot.nhs.uk/services/mindfulness/']]},
+help:{t:'Addiction and recovery support',short:'Any addiction affects mental health. Support is free and confidential.',
+ pts:['Anything can go here: alcohol, drugs, gambling, nicotine, food, screens. What matters is noticing patterns and asking for help.','US: SAMHSA’s National Helpline is free, confidential and open 24/7 on 1-800-662-4357, for mental health and substance use.','UK: FRANK gives free, confidential drug and alcohol advice on 0300 123 6600, 24 hours a day.','If you’re in danger, or may have taken too much of something, call your local emergency number straight away.'],
+ src:[['SAMHSA National Helpline (US)','https://www.samhsa.gov/find-help/helplines/national-helpline'],['FRANK (UK)','https://www.talktofrank.com/']]},
+relapse:{t:'Relapse prevention: early warning signs',short:'Relapse is usually gradual. Noticing early signs gives you time to act. Noticing one is useful, not a failure.',
+ pts:['A 2015 clinical overview describes relapse as a gradual process in three stages: emotional (for example isolating, bottling up feelings, skipping support, poor sleep and eating), mental (cravings, bargaining, planning) and physical (using again). The aim is to spot the early stage, when acting is easiest.','The author’s HALT reminder: check whether you’re hungry, angry, lonely or tired. Basic self-care often slips first.','Five rules the author suggests: change your life so it’s easier not to use, be honest with people you trust, ask for help, look after yourself, and don’t look for loopholes.','Setbacks are common and fixable. Treating one as proof you’ve failed can make things worse, so look for what to change instead.','This is one clinician’s perspective, based mainly on experience and written for use in therapy. Some parts cite trials, for example on early-warning-sign training and mindfulness-based relapse prevention, but it isn’t a systematic review. It doesn’t replace professional care.'],
+ src:[['Melemis 2015, Yale Journal of Biology and Medicine','https://pmc.ncbi.nlm.nih.gov/articles/PMC4553654/']]},
+water:{t:'Water and hydration',short:'',
+ pts:['NHS guidance for adults is roughly 6 to 8 cups or glasses of fluid a day. Water, lower-fat milk and sugar-free drinks, including tea and coffee, all count, and some fluid comes from food.','Needs vary. The NHS suggests drinking extra if you’ve been sweating from activity or you’re unwell.','Drinking far more than you need can also be harmful, and some health conditions and medicines change how much is right for you. A doctor or pharmacist can help you set your own goal.'],
+ src:[['NHS: Water, drinks and hydration','https://www.nhs.uk/live-well/eat-well/food-guidelines-and-food-labels/water-drinks-nutrition/']]}
+};
+const MS={1:'Your first check-in. Showing up is the hardest part, and you did it.',7:'Seven check-ins: a full week of paying attention to yourself. Well done.',14:'Two weeks’ worth of check-ins. You’re building something steady.',30:'Thirty check-ins, a month’s worth of honest showing up. That takes real commitment.',60:'Sixty check-ins. Two months of looking after yourself, one day at a time.',100:'One hundred check-ins. Look how far your attention has taken you.',180:'Half a year’s worth of check-ins. That’s something to be proud of.',365:'A full year’s worth of check-ins. That’s extraordinary. Be proud of yourself.',500:'Five hundred check-ins. Your commitment to yourself keeps showing.',730:'Two years’ worth of check-ins. Thank you for caring for yourself so consistently.',1000:'One thousand check-ins. What an achievement. You should be very proud.'};
+const DEF={sections:[
+{id:'s2',title:'Morning',items:[{id:'moodAm',label:'Morning mood',type:'scale'},{id:'sleep',label:'Sleep last night (hours)',type:'num'},{id:'up',label:'Time up',type:'time'},{id:'meds',label:'Meds taken',type:'check'}]},
+{id:'s3',title:'Food and snacks',info:'gut',items:[{id:'bkf',label:'Breakfast',type:'check'},{id:'lunch',label:'Lunch',type:'check'},{id:'dinner',label:'Dinner',type:'check'},{id:'snk',label:'Snacks, sweets and junk food',type:'log',p:['What did you eat or drink?','How much (1–5)','How did I feel afterwards? (optional)']}]},
+{id:'s1',title:'Afternoon check-in',items:[{id:'moodMid',label:'Afternoon mood',type:'scale'},{id:'moodWhy',label:'What’s affecting my mood today?',type:'text'}]},
+{id:'s4',title:'Mood helpers',info:'five',items:[{id:'outside',label:'Went outside',type:'check'},{id:'gym',label:'Exercise or movement',type:'check'},{id:'water',label:'Cups of water today',type:'num',g:6,h:'A common guide for adults is about 6 to 8 cups or glasses of fluid a day. Water, tea, coffee and lower-fat milk all count. You may need more when it’s hot, you’re active or unwell. Set a goal that suits you, and check with a doctor or pharmacist if you’re unsure, especially if you have a health condition or take medication.'},{id:'chores',label:'Kept on top of chores',type:'check'},{id:'reach',label:'Connected with someone',type:'check'}]},
+{id:'s5',title:'Activities',items:[{id:'acts',label:'What I did today',type:'pick',o:['Walk','Run','Gym','Yoga or stretching','Cycling','Swimming','Cooking','Reading','Creative hobby','Time with friends or family','Meditation or mindfulness','Therapy or support group','Volunteering','Work','Rest','Other']},{id:'actMin',label:'Active time (minutes)',type:'num'},{id:'work',label:'Work (hours)',type:'num'},{id:'tv',label:'TV or screen time (hours)',type:'num'}]},
+{id:'s6',title:'Recovery and habits',info:'help',items:[{id:'focus',label:'What I’m working on (for example alcohol, gambling, nicotine, junk food)',type:'text'},{id:'clean',label:'Stayed on track today',type:'check'},{id:'slip',label:'Had a slip today',type:'check'},{id:'cr',label:'Cravings and urges',type:'log'},{id:'support',label:'Reached out for support',type:'check'}]},
+{id:'s9',title:'Early warning check',info:'relapse',items:[{id:'ewH',label:'Hungry',type:'check',neg:true},{id:'ewA',label:'Angry',type:'check',neg:true},{id:'ewL',label:'Lonely',type:'check',neg:true},{id:'ewT',label:'Tired',type:'check',neg:true},{id:'ewIso',label:'Isolating or avoiding people',type:'check',neg:true},{id:'ewBot',label:'Bottling up my feelings',type:'check',neg:true},{id:'ewSkip',label:'Skipped support or a meeting',type:'check',neg:true},{id:'ewSelf',label:'Poor sleep or eating',type:'check',neg:true},{id:'ewThink',label:'Thinking a lot about using, or about people and places linked to it',type:'check',neg:true},{id:'ewBarg',label:'Bargaining or planning ‘just once’',type:'check',neg:true},{id:'ewPlan',label:'What I’ll do about it (optional)',type:'text'}]},
+{id:'s7',title:'Personal admin and chores',items:[{id:'a1',label:'Paid a bill or checked my budget',type:'check'},{id:'a2',label:'Replied to one important message',type:'check'},{id:'a3',label:'Tidied one space',type:'check'},{id:'a4',label:'Laundry or dishes',type:'check'}]},
+{id:'s8',title:'Evening',items:[{id:'moodPm',label:'Evening mood',type:'scale'},{id:'bed',label:'Bed time',type:'time'},{id:'win',label:'One thing that went well',type:'text'},{id:'hard',label:'One thing that was hard',type:'text'},{id:'next',label:'My commitment for tomorrow',type:'text'}]}
+]};
+const WATER=DEF.sections.reduce((a,x)=>a.concat(x.items),[]).filter(i=>i.id==='water')[0];
+function clone(o){return JSON.parse(JSON.stringify(o))}
+function ld(k,d){try{const v=JSON.parse(localStorage.getItem(k)||'null');return v==null?d:v}catch(e){return d}}
+function sv(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}
+let data=ld(KEY,{}),cfg=ld(CK,null),meta=ld(MK,{}),view='day',armed='',note='',rng=14,hidAt=0,po='',flash='',entryKey='',fArm=false,lf='';
+if(!cfg||!cfg.sections)cfg=clone(DEF);
+let mig=false;cfg.sections.forEach(s=>s.items.forEach((i,ix)=>{if(i.id==='water'&&i.type==='check'){s.items[ix]=JSON.parse(JSON.stringify(WATER));mig=true}}));
+if(!meta.ew){if(!cfg.sections.some(x=>x.id==='s9')){const at=cfg.sections.findIndex(x=>x.id==='s6');cfg.sections.splice(at>=0?at+1:cfg.sections.length,0,JSON.parse(JSON.stringify(DEF.sections.filter(x=>x.id==='s9')[0])))}meta.ew=true;saveMeta();saveCfg()}
+if(mig){saveCfg();Object.keys(data).forEach(k=>{if(data[k]&&data[k].water===true)data[k].water=''});save()}
+function save(){sv(KEY,data)}function saveCfg(){sv(CK,cfg)}function saveMeta(){sv(MK,meta)}
+function iso(d){const z=new Date(d.getTime()-d.getTimezoneOffset()*6e4);return z.toISOString().slice(0,10)}
+function today(){return iso(new Date())}
+function addDays(s,n){const d=new Date(s+'T12:00:00');d.setDate(d.getDate()+n);return iso(d)}
+function fmt(k,o){return new Date(k+'T12:00:00').toLocaleDateString(undefined,o)}
+let day=today(),lastToday=day;
+function cur(){return data[day]||(data[day]={})}
+function uid(){return 'x'+Math.random().toString(36).slice(2,8)+Date.now().toString(36).slice(-3)}
+function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]))}
+function checks(){const a=[];cfg.sections.forEach(s=>s.items.forEach(i=>{if(i.type==='check'&&!i.neg)a.push(i.id)}));return a}
+function hasData(d){if(!d)return false;for(const k in d){const v=d[k];if(Array.isArray(v)?v.length:(v!==''&&v!==false&&v!=null))return true}return false}
+function days(n){const c=n?addDays(today(),-(n-1)):'';return Object.keys(data).filter(k=>k>=c&&hasData(data[k])).sort()}
+function done(d,ck){return ck.filter(k=>d&&d[k]===true).length}
+function finished(){return Object.keys(data).filter(k=>data[k]&&data[k]._done).length}
+function nextMs(n){return Object.keys(MS).map(Number).filter(x=>x>n).sort((x,y)=>x-y)[0]}
+function avg(a){return a.reduce((x,y)=>x+y,0)/a.length}
+function logOne(c){return c.what+' ('+c.lvl+'/5)'+(c.did?', '+c.did:'')}
+function logTxt(v){return (Array.isArray(v)?v:[]).map(logOne).join('; ')}
+function link(l){return '<a href="'+l[1]+'" target="_blank" rel="noopener noreferrer">'+l[0]+'</a>'}
+function field(f,d){
+ const k=f.id,l=esc(f.label),v=d[k],t=f.type;
+ if(t==='check')return `<div class="row"><label for="${k}">${l}</label><input type="checkbox" id="${k}" data-k="${k}"${v?' checked':''}></div>`;
+ if(t==='time')return `<div class="row"><label for="${k}">${l}</label><input type="time" id="${k}" data-k="${k}" value="${esc(v)}"></div>`;
+ if(t==='num')return `<div class="row"><label for="${k}">${l}</label><input type="number" inputmode="decimal" min="0" step="0.25" id="${k}" data-k="${k}" value="${esc(v)}"></div>`+(f.h?`<p class="hint" style="margin:0 0 4px">${esc(f.h)} <button class="sm" data-a="lm,${k}">Learn more</button></p>`:'')+(f.g!==undefined?`<div class="row" style="border:0;padding-top:0"><label for="g${k}" class="hint">My daily goal (cups)</label><input type="number" inputmode="decimal" min="0" step="1" id="g${k}" data-g="${k}" value="${esc(f.g)}"></div>`:'');
+ if(t==='text')return `<div class="col"><label for="${k}">${l}</label><textarea id="${k}" data-k="${k}">${esc(v)}</textarea></div>`;
+ if(t==='scale'){let b='';for(let i=1;i<=5;i++)b+=`<button type="button" data-a="sc,${k},${i}" class="${v==i?'on':''}" aria-pressed="${v==i}">${i}</button>`;return `<div class="col"><div>${l} <span class="hint">1 low, 5 good</span></div><div class="scale">${b}</div></div>`}
+ if(t==='pick'){const sel=Array.isArray(v)?v:[];return `<div class="col"><h3>${l}</h3><div class="row" style="border:0;padding:0"><select id="p${k}" aria-label="${l}">${(f.o||[]).map(x=>`<option>${esc(x)}</option>`).join('')}</select><button class="add" style="margin:0" data-a="pa,${k}">Add</button></div><div class="chips">${sel.map((x,i)=>`<button class="chip" data-a="px,${k},${i}" aria-label="Remove ${esc(x)}">${esc(x)} ×</button>`).join('')}</div></div>`}
+ const p=f.p||LP,list=(Array.isArray(v)?v:[]).map((c,i)=>`<div class="log"><div><b>${esc(c.lvl)}/5</b> ${esc(c.what)}${c.did?`<br><span class="hint">${esc(c.did)}</span>`:''}</div><button data-a="rm,${k},${i}" aria-label="Remove entry">×</button></div>`).join('');
+ return `<div class="col"><h3>${l}</h3><label for="w${k}">${esc(p[0])}</label><input type="text" class="full" id="w${k}"><div class="row" style="border:0;padding-bottom:0"><label for="l${k}">${esc(p[1])}</label><select id="l${k}"><option>1</option><option>2</option><option selected>3</option><option>4</option><option>5</option></select></div><label for="d${k}">${esc(p[2])}</label><input type="text" class="full" id="d${k}"><button class="add" data-a="la,${k}">Add entry</button>${list}</div>`;
+}
+function dayView(){
+ const d=cur(),pd=data[addDays(day,-1)];
+ const hr=new Date().getHours(),hi=day!==today()?'':(hr<12?'Good morning.':hr<18?'Good afternoon.':'Good evening.');
+ let h=`<div class="dn"><button class="nb" data-a="shift,-1" aria-label="Previous day">‹</button><div class="date">${d._done?'<span style="color:var(--warn)" role="img" aria-label="Day saved">★ </span>':''}${fmt(day,{weekday:'long',month:'long',day:'numeric'})}</div><button class="nb" data-a="shift,1" aria-label="Next day"${day>=today()?' disabled':''}>›</button></div>`;
+ if(day!==today())h+='<button class="sm" style="width:100%;margin-bottom:10px" data-a="today">Back to today</button>';
+ if(!days(0).length&&!meta.hi)h+=`<div class="card acc"><b>${hi} Welcome.</b><p style="margin:6px 0">Fill in what applies and skip the rest. Everything saves as you go. When you’re done, tap <b>Finish today</b> at the bottom to add it to your journal.</p><button class="sm" data-a="hi">Got it</button></div>`;
+ const last=days(0).filter(k=>k<today()).pop(),gap=last?Math.round((new Date(today()+'T12:00:00')-new Date(last+'T12:00:00'))/864e5):0;
+ if(day===today()&&last&&gap>=3&&!hasData(data[today()])&&meta.wb!==today())h+=`<div class="card acc"><b>Welcome back.</b><p style="margin:6px 0">It’s been ${gap} days since your last check-in. That’s okay. Today is a fresh start, and even a quick check-in counts.</p><button class="sm" data-a="wb">Thanks</button></div>`;
+ if(pd&&pd.next&&day===today())h+=`<div class="card acc"><div class="hint">Yesterday you committed to</div><div>${esc(pd.next)}</div></div>`;
+ if(days(0).length>=3&&(!meta.lb||Date.now()-meta.lb>6048e5))h+='<div class="note"><span>Back up your entries so a lost phone or cleared browser doesn’t erase them.</span><button class="sm" data-a="tab,export">Back up</button></div>';
+ h+='<div class="prog"><div><b id="pt"></b></div><div class="bar"><i id="pb"></i></div><div class="week" id="wk" aria-label="Last 7 days"></div><div class="hint" id="ci" style="margin-top:6px"></div></div>';
+ h+=cfg.sections.map(s=>{
+  const ck=s.items.filter(i=>i.type==='check'&&!i.neg),n=ck.filter(i=>d[i.id]===true).length,inf=INFO[s.info];
+  return `<section><h2><span>${esc(s.title)}</span>${ck.length?`<span class="hint">${n}/${ck.length}</span>`:''}</h2>${inf?`<p class="hint" style="margin:0 0 4px">${inf.short} <button class="sm" data-a="lm,${s.info}">Learn more</button></p>`:''}${s.items.length?s.items.map(f=>field(f,d)).join(''):'<p class="hint">Nothing here yet. Open More, then Edit, to add items.</p>'}</section>`;
+ }).join('')||'<p class="hint">No sections yet. Open More, then Edit, to add one.</p>';
+ h+=`<button class="add" style="width:100%;margin:0 0 6px" data-a="fin">${d._done?'Saved to journal. Tap to update':'Finish today and save to journal'}</button>`;
+ return h;
+}
+function prog(){
+ const ck=checks(),t=Math.max(ck.length,1),n=done(cur(),ck);let w='';
+ document.getElementById('pt').textContent=ck.length?n+' of '+ck.length+' ticked':'No checkboxes yet';
+ document.getElementById('pb').style.width=(n/t*100)+'%';
+ for(let i=6;i>=0;i--){const k=addDays(day,-i);w+=`<div class="${k===day?'on':''}"><i style="font-style:normal;color:var(--warn);font-size:12px;line-height:14px;display:block;height:14px">${data[k]&&data[k]._done?'★':''}</i><span style="height:${Math.max(4,done(data[k],ck)/t*30)}px"></span>${fmt(k,{weekday:'narrow'})}</div>`}
+ document.getElementById('wk').innerHTML=w;
+ const n2=finished(),nx=nextMs(n2);document.getElementById('ci').textContent=n2?'★ '+n2+(n2===1?' day':' days')+' saved to your journal'+(nx?'. Next milestone at '+nx+'.':'.'):'Finish a day to earn your first star.';
+}
+function dayLines(k){
+ const d=data[k]||{},out=[];
+ cfg.sections.forEach(s=>{
+  const L=[],on=[],off=[],wn=[];
+  s.items.forEach(i=>{const v=d[i.id];
+   if(i.type==='check'){if(i.neg){if(v===true)wn.push(i.label)}else(v===true?on:off).push(i.label)}
+   else if(i.type==='scale'){if(v)L.push(i.label+': '+v+'/5')}
+   else if(i.type==='log'){if(Array.isArray(v)&&v.length)L.push(i.label+':\n'+v.map(c=>'  - '+logOne(c)).join('\n'))}
+   else if(i.type==='pick'){if(Array.isArray(v)&&v.length)L.push(i.label+': '+v.join(', '))}
+   else if(v!==undefined&&v!==''&&v!==null)L.push(i.label+': '+v);
+  });
+  if(wn.length)L.push('Early warning signs noticed: '+wn.join(', '));
+  if(on.length||L.length){if(on.length)L.push('Ticked: '+on.join(', '));if(off.length)L.push('Not ticked: '+off.join(', '));out.push([s.title,L])}
+ });
+ return out;
+}
+function dayText(k){return fmt(k,{weekday:'long',day:'numeric',month:'long',year:'numeric'})+'\n\n'+dayLines(k).map(x=>x[0]+'\n'+x[1].join('\n')).join('\n\n')}
+function journalView(){
+ const ck=checks(),ks=days(0).reverse().slice(0,120);
+ if(!ks.length)return '<div class="card"><b>Your journal is empty.</b><p class="hint">Finish a day and it appears here, like a diary you can read back.</p></div>';
+ return '<p class="hint">Tap a day to read it back.</p>'+ks.map(k=>{
+  const ex=[];cfg.sections.forEach(s=>s.items.forEach(it=>{const v=data[k][it.id];if(it.type==='scale'&&v)ex.push(esc(it.label)+' '+v)}));
+  return `<button class="hrow" data-a="ent,${k}"><span><b>${fmt(k,{weekday:'short',month:'short',day:'numeric'})}</b>${data[k]._done?'<span class="tagd" style="color:var(--warn)">★ Saved</span>':''}<br><span class="hint">${ex.slice(0,3).join(', ')||'&nbsp;'}</span></span><span class="hint">${done(data[k],ck)}/${ck.length}</span></button>`;
+ }).join('');
+}
+function entryView(){
+ const k=entryKey,L=dayLines(k);
+ let h=`<button class="sm" style="margin-bottom:10px" data-a="tab,journal">‹ Journal</button><h2 style="font-size:20px">${fmt(k,{weekday:'long',month:'long',day:'numeric',year:'numeric'})}</h2>`;
+ if(data[k]&&data[k]._done)h+=`<p class="hint">★ Saved to journal at ${new Date(data[k]._done).toLocaleTimeString(undefined,{hour:'numeric',minute:'2-digit'})}</p>`;
+ h+=L.length?L.map(x=>`<section><h2>${esc(x[0])}</h2>${x[1].map(l=>`<p style="margin:6px 0;white-space:pre-wrap">${esc(l)}</p>`).join('')}</section>`).join(''):'<p class="hint">No answers saved for this day.</p>';
+ return h+`<div class="row" style="border:0;flex-wrap:wrap"><button class="add" style="margin:0" data-a="open,${k}">Edit this day</button><button class="sm" data-a="shd,${k}">Share this day</button></div>`;
+}
+function chart(title,vals,max){
+ const n=vals.length,bw=300/n,xs=vals.filter(v=>v!=null);let s='';
+ vals.forEach((v,i)=>{if(v==null)return;const bh=Math.max(2,v/max*60);s+=`<rect x="${i*bw+1}" y="${62-bh}" width="${Math.max(1,bw-2)}" height="${bh}" rx="2" style="fill:var(--acc)"/>`});
+ return `<section><h3>${esc(title)}</h3><svg viewBox="0 0 300 64" width="100%" role="img" aria-label="${esc(title)} over the last ${n} days" style="display:block"><line x1="0" y1="63" x2="300" y2="63" style="stroke:var(--line)"/>${s}</svg><div class="hint">${xs.length?'Average '+avg(xs).toFixed(1)+' across '+xs.length+' days logged':'No entries in this range yet'}</div></section>`;
+}
+function patterns(){
+ const sc=[];cfg.sections.forEach(s=>s.items.forEach(i=>{if(i.type==='scale')sc.push(i)}));
+ if(!sc.length)return '';
+ const o=sc.filter(i=>i.id===po)[0]||sc[0],ks=days(0).filter(k=>data[k][o.id]),rows=[];
+ cfg.sections.forEach(s=>s.items.forEach(i=>{if(i.type!=='check')return;
+  const a=[],b=[];ks.forEach(k=>(data[k][i.id]===true?a:b).push(+data[k][o.id]));
+  if(a.length>=3&&b.length>=3)rows.push({l:i.label,a:avg(a),b:avg(b),na:a.length,nb:b.length});
+ }));
+ rows.sort((x,y)=>(y.a-y.b)-(x.a-x.b));
+ return `<section><h2>Patterns</h2><label for="po">Compare against</label> <select id="po" data-po="1">${sc.map(i=>`<option value="${i.id}"${i.id===o.id?' selected':''}>${esc(i.label)}</option>`).join('')}</select><p class="hint">Average ${esc(o.label.toLowerCase())} on days you ticked something and days you didn’t. Needs at least 3 days each way.</p>${rows.length?rows.slice(0,10).map(r=>`<div class="row"><span>${esc(r.l)}</span><span class="hint">${r.a.toFixed(1)} ticked (${r.na}) vs ${r.b.toFixed(1)} not (${r.nb})</span></div>`).join(''):'<p class="hint">Not enough days yet. Keep logging.</p>'}<p class="hint">These are patterns in your own data, not proof that one thing causes another. Use them as questions to explore, and talk to a professional if you’re worried.</p></section>`;
+}
+function trendView(){
+ const ck=checks(),ds=[];for(let i=rng-1;i>=0;i--)ds.push(addDays(today(),-i));
+ let h='<div class="seg">'+[14,30,90].map(n=>`<button data-a="rng,${n}" class="${rng===n?'on':''}">${n} days</button>`).join('')+'</div>';
+ if(ck.length)h+=chart('Checkboxes ticked per day',ds.map(k=>data[k]?done(data[k],ck):null),ck.length);
+ cfg.sections.forEach(s=>s.items.forEach(it=>{
+  if(it.type==='num'||it.type==='scale'){const v=ds.map(k=>{const x=data[k]&&parseFloat(data[k][it.id]);return x===undefined||isNaN(x)?null:x});h+=chart(it.label,v,it.type==='scale'?5:Math.max(...v,1))}
+  else if(it.type==='log'){const v=ds.map(k=>data[k]&&hasData(data[k])?(Array.isArray(data[k][it.id])?data[k][it.id].length:0):null);h+=chart(it.label+' (entries per day)',v,Math.max(...v,1))}
+ }));
+ return h+patterns();
+}
+function learnView(){
+ return '<p class="hint">Short, sourced notes. These are general information, not medical advice.</p>'+Object.keys(INFO).map(k=>{const i=INFO[k];return `<section id="lm-${k}"><h2>${i.t}</h2><ul class="pts">${i.pts.map(p=>`<li>${p}</li>`).join('')}</ul><p class="hint">Sources: ${i.src.map(link).join(' · ')}</p></section>`}).join('')+(lf?'<div style="height:64px"></div><button class="fab" data-a="tab,day">‹ Back to today</button>':'');
+}
+function moreView(){
+ const r=(a,t,s)=>`<button class="hrow" data-a="tab,${a}"><span><b>${t}</b><br><span class="hint">${s}</span></span><span>›</span></button>`;
+ return r('export','Export and backup','Summaries, spreadsheet, encrypted backup')+r('edit','Edit layout and lock','Change sections, checklists, PIN')+r('about','About and help','Privacy, purpose, support lines')+(TIP_URL?`<a class="hrow" style="text-decoration:none" href="${TIP_URL}" target="_blank" rel="noopener noreferrer"><span><b>Leave a tip</b><br><span class="hint">The app is free. Tips are optional.</span></span><span>›</span></a>`:'');
+}
+function aboutView(){
+ return `<button class="sm" style="margin-bottom:10px" data-a="tab,more">‹ More</button>
+<section><h2>What this is</h2><p>A simple daily checklist for tracking habits linked to mental health and addiction, so you can stay accountable to yourself. It isn’t a diagnosis, a treatment, or a replacement for professional care.</p></section>
+<section><h2>How to use it</h2><ul class="pts"><li>Fill in what applies each day and skip the rest.</li><li>Tap Finish today to save the day to your journal.</li><li>Read your journal back like a diary, and use Trends and Patterns to draw your own conclusions.</li><li>Share a day with someone you trust if you want an accountability partner.</li><li>Change anything under More, then Edit.</li></ul></section>
+<section><h2>Your privacy</h2><ul class="pts"><li>Your entries stay on this device. There are no accounts, no tracking and no data sent anywhere.</li><li>The PIN hides the app. It doesn’t encrypt what’s stored.</li><li>Backups are encrypted with a passphrase you choose, so it’s safe to keep them in cloud notes or email when you change device. If you lose the passphrase, the backup can’t be opened.</li><li>If you clear your browser data or lose your device without a backup, your entries are gone.</li></ul></section>
+<section><h2>Stars and milestones</h2><p>Finishing a day earns a star, whatever that day held, including days with a slip. Milestones count your total check-ins, so a missed day never resets your progress. If you’ve been away a few days, the app welcomes you back without any guilt.</p></section>
+<section><h2>Evidence</h2><p>Where a note makes a claim, it links to its source on the Learn tab. Some simple habits, like drinking water or doing chores, are tracked because they’re easy to count, not because we’ve cited a study for each.</p></section>
+<section><h2>Free, with an optional tip</h2><p>The app is free and always will be. ${TIP_URL?'If it helps you, you can leave a tip under More.':'A tip option will appear under More when it’s set up.'}</p></section>
+<section><h2>Need help now?</h2><p>US: call or text 988 for crisis support, or SAMHSA’s helpline on 1-800-662-4357 for substance use and mental health. UK: FRANK on 0300 123 6600. If you’re in danger, call your local emergency number.</p></section>
+<p class="hint">Version 2, October 2026</p>`;
+}
+function exportView(){
+ return `<button class="sm" style="margin-bottom:10px" data-a="tab,more">‹ More</button><section><h2>Export and backup</h2><p class="hint">Summaries and spreadsheets are plain text, for sharing with a therapist or doctor. Backups are encrypted with your passphrase.</p>
+<label for="xr">Days to include</label> <select id="xr"><option value="7">Last 7</option><option value="30" selected>Last 30</option><option value="90">Last 90</option><option value="0">Everything</option></select>
+<label for="pp" style="display:block;margin-top:10px">Passphrase for backups (8 or more characters)</label><input type="password" class="full" id="pp" autocomplete="off">
+<div class="row" style="border:0;flex-wrap:wrap"><button class="add" style="margin:0" data-a="gen,sum">Summary</button><button class="add" style="margin:0" data-a="gen,csv">Spreadsheet</button><button class="add" style="margin:0" data-a="gen,bk">Encrypted backup</button></div>
+<textarea id="ot" style="min-height:140px" aria-label="Export text"></textarea>
+<div class="row" style="border:0;flex-wrap:wrap"><button class="sm" data-a="cp">Copy</button><button class="sm" data-a="sh">Share</button><button class="sm${armed==='im'?' del':''}" data-a="im">${armed==='im'?'Replace my data?':'Import pasted backup'}</button></div>
+<div class="hint" id="st">${esc(note)}</div><p class="hint">Last backup: ${meta.lb?new Date(meta.lb).toLocaleDateString():'never'}. To restore, paste an encrypted backup above, enter its passphrase, and tap Import. Import replaces what is on this device.</p></section>`;
+}
+function btn(a,txt,key,label){return `<button class="sm${a==='del'?' del':''}" data-a="${key}" aria-label="${label}">${armed===key?'Sure?':txt}</button>`}
+function opts(){return Object.keys(TL).map(k=>`<option value="${k}">${TL[k]}</option>`).join('')}
+function delayOpts(){const cd=meta.delay==null?1:meta.delay;return [[0,'Immediately'],[1,'1 minute'],[5,'5 minutes'],[15,'15 minutes'],[60,'1 hour'],[240,'4 hours']].map(o=>`<option value="${o[0]}"${o[0]===cd?' selected':''}>${o[1]}</option>`).join('')}
+function editView(){
+ let h='<button class="sm" style="margin-bottom:10px" data-a="tab,more">‹ More</button><p class="hint">Rename anything, reorder with the arrows, or delete. Tap delete twice to confirm. Past entries stay saved. For dropdown lists, edit the options on the line below, separated by commas.</p>';
+ cfg.sections.forEach((s,si)=>{
+  h+=`<section class="ed"><div class="row"><input type="text" data-st="${si}" value="${esc(s.title)}" aria-label="Section name"><div class="tools">${btn('','↑','ms,'+si+',-1','Move section up')+btn('','↓','ms,'+si+',1','Move section down')+btn('del','✕','ds,'+si,'Delete section')}</div></div>`;
+  s.items.forEach((it,ii)=>{
+   h+=`<div class="row"><input type="text" data-it="${si},${ii}" value="${esc(it.label)}" aria-label="Item name"><span class="tag">${it.neg?'Warning':TL[it.type]}</span><div class="tools">${btn('','↑','mi,'+si+','+ii+',-1','Move item up')+btn('','↓','mi,'+si+','+ii+',1','Move item down')+btn('del','✕','di,'+si+','+ii,'Delete item')}</div></div>`;
+   if(it.type==='pick')h+=`<div class="row" style="border:0;padding-top:0"><input type="text" class="full" style="margin:0" data-op="${si},${ii}" value="${esc((it.o||[]).join(', '))}" aria-label="Dropdown options, separated by commas"></div>`;
+  });
+  h+=`<div class="col"><input type="text" class="full" id="ni${si}" placeholder="New item name"><div class="row" style="border:0;padding-bottom:0"><select id="nt${si}" aria-label="Item type">${opts()}</select><button class="add" style="margin:0" data-a="ai,${si}">Add item</button></div></div></section>`;
+ });
+ h+='<section><h2>New section or checklist</h2><input type="text" class="full" id="ns" placeholder="Name, for example Before I go out"><textarea id="nl" placeholder="Checklist items, one per line (optional)"></textarea><button class="add" data-a="as">Add section</button></section>';
+ h+=`<section><h2>Privacy lock</h2><p class="hint">${meta.pin?'A PIN is set. The app asks for it if you’ve been away longer than the time you choose below.':'Ask for a PIN if you’ve been away from the app longer than the time you choose below.'} This hides your entries on this device. It doesn’t encrypt them.</p><label for="pd">Ask for the PIN after being away for</label><select id="pd" style="margin:6px 0 12px;display:block">${delayOpts()}</select><label for="pn">${meta.pin?'New PIN':'PIN'} (4 to 6 digits)</label><input type="password" inputmode="numeric" maxlength="6" class="full" id="pn" autocomplete="off"><div class="row" style="border:0"><button class="add" style="margin:0" data-a="ps">${meta.pin?'Change PIN':'Set PIN'}</button>${meta.pin?btn('del','Turn off','pr','Turn off lock'):''}</div>${meta.pin&&canBio?`<div class="row" style="border:0"><span>Face ID or fingerprint</span>${meta.bio?'<button class="sm" data-a="bo">Turn off</button>':'<button class="sm" data-a="bn">Turn on</button>'}</div>`:''}<div class="hint" id="st">${esc(note)}</div></section>`;
+ return h+`<section><div class="row"><span>Restore the starter layout</span>${btn('del','Reset','rs','Reset layout')}</div></section>`;
+}
+function render(){
+ const tabs=[['day','Today'],['journal','Journal'],['trend','Trends'],['learn','Learn'],['more','More']],on={entry:'journal',export:'more',edit:'more',about:'more'}[view]||view;
+ document.getElementById('tb').innerHTML=tabs.map(t=>`<button data-a="tab,${t[0]}" class="${on===t[0]?'on':''}"${on===t[0]?' aria-current="page"':''}>${t[1]}</button>`).join('');
+ let h=({day:dayView,journal:journalView,entry:entryView,trend:trendView,learn:learnView,more:moreView,about:aboutView,export:exportView,edit:editView})[view]();
+ if(flash){h=`<div class="note"><span>${esc(flash)}</span></div>`+h;flash=''}
+ document.getElementById('app').innerHTML=h;
+ if(view==='day')prog();
+}
+function say(t){note=t;const s=document.getElementById('st');if(s)s.textContent=t}
+function mv(a,i,n){const j=i+n;if(j<0||j>=a.length)return;const x=a[i];a[i]=a[j];a[j]=x}
+function q(v){return '"'+String(v==null?'':v).replace(/"/g,'""')+'"'}
+function summary(n){
+ const ks=days(n);if(!ks.length)return 'No entries in this range.';
+ const L=['Check-in summary: '+ks[0]+' to '+ks[ks.length-1]+' ('+ks.length+' days logged)',''];
+ cfg.sections.forEach(s=>{L.push(s.title);s.items.forEach(it=>{
+  const vals=ks.map(k=>data[k][it.id]);
+  if(it.type==='check')L.push('- '+it.label+': '+vals.filter(v=>v===true).length+' of '+ks.length+' days');
+  else if(it.type==='num'||it.type==='scale'){const x=vals.map(parseFloat).filter(v=>!isNaN(v));L.push('- '+it.label+': '+(x.length?'average '+avg(x).toFixed(1)+' over '+x.length+' days':'no entries'))}
+  else if(it.type==='log'){let c=0;vals.forEach(v=>{if(Array.isArray(v))c+=v.length});L.push('- '+it.label+': '+c+' entries');ks.forEach(k=>{const t=logTxt(data[k][it.id]);if(t)L.push('    '+k+': '+t)})}
+  else if(it.type==='pick'){const m={};vals.forEach(v=>{if(Array.isArray(v))v.forEach(x=>m[x]=(m[x]||0)+1)});L.push('- '+it.label+': '+(Object.keys(m).map(x=>x+' '+m[x]).join(', ')||'no entries'))}
+  else L.push('- '+it.label+': '+vals.filter(v=>v).length+' entries');
+ });L.push('')});
+ return L.join('\n');
+}
+function csv(n){
+ const its=[];cfg.sections.forEach(s=>s.items.forEach(i=>its.push(i)));
+ const r=[['Date'].concat(its.map(i=>i.label)).map(q).join(',')];
+ days(n).forEach(k=>r.push([k].concat(its.map(i=>{const v=data[k][i.id];return i.type==='check'?(v===true?'Yes':''):i.type==='log'?logTxt(v):i.type==='pick'?(Array.isArray(v)?v.join('; '):''):v})).map(q).join(',')));
+ return r.join('\n');
+}
+function fb(){const o=document.getElementById('ot');o.focus();o.select();try{return document.execCommand('copy')}catch(e){return false}}
+function markBackup(t){if(t.indexOf('dci1:')===0||t.indexOf('{"v":1')===0){meta.lb=Date.now();saveMeta()}}
+const TE=new TextEncoder(),TD=new TextDecoder();
+function rnd(n){const a=new Uint8Array(n);crypto.getRandomValues(a);return a}
+function b64(b){const u=new Uint8Array(b);let s='';for(let i=0;i<u.length;i+=8192)s+=String.fromCharCode.apply(null,u.subarray(i,i+8192));return btoa(s)}
+function unb64(s){return Uint8Array.from(atob(s),c=>c.charCodeAt(0))}
+function dkey(pass,salt){return crypto.subtle.importKey('raw',TE.encode(pass),'PBKDF2',false,['deriveKey']).then(k=>crypto.subtle.deriveKey({name:'PBKDF2',salt:salt,iterations:250000,hash:'SHA-256'},k,{name:'AES-GCM',length:256},false,['encrypt','decrypt']))}
+function encText(pass,text){const salt=rnd(16),iv=rnd(12);return dkey(pass,salt).then(k=>crypto.subtle.encrypt({name:'AES-GCM',iv:iv},k,TE.encode(text))).then(ct=>'dci1:'+b64(salt)+'.'+b64(iv)+'.'+b64(ct))}
+function decText(pass,t){const p=t.trim().slice(5).split('.');return dkey(pass,unb64(p[0])).then(k=>crypto.subtle.decrypt({name:'AES-GCM',iv:unb64(p[1])},k,unb64(p[2]))).then(b=>TD.decode(b))}
+function sha(s){
+ if(window.crypto&&crypto.subtle)return crypto.subtle.digest('SHA-256',TE.encode(s)).then(b=>Array.prototype.map.call(new Uint8Array(b),x=>('0'+x.toString(16)).slice(-2)).join(''));
+ let h=0;for(let i=0;i<s.length;i++)h=(h*31+s.charCodeAt(i))|0;return Promise.resolve('f'+h);
+}
+const canBio=!!(window.PublicKeyCredential&&navigator.credentials&&navigator.credentials.create&&window.crypto&&crypto.getRandomValues);
+function bioEnroll(){
+ if(!canBio)return Promise.resolve(false);
+ try{return navigator.credentials.create({publicKey:{challenge:rnd(32),rp:{name:'Daily check-in'},user:{id:rnd(16),name:'me',displayName:'Me'},pubKeyCredParams:[{type:'public-key',alg:-7},{type:'public-key',alg:-257}],authenticatorSelection:{authenticatorAttachment:'platform',userVerification:'required'},timeout:60000}}).then(c=>{meta.bio=b64(c.rawId);saveMeta();return true},()=>false)}catch(e){return Promise.resolve(false)}
+}
+function bioAuth(){
+ if(!meta.bio||!canBio)return Promise.resolve(false);
+ try{return navigator.credentials.get({publicKey:{challenge:rnd(32),allowCredentials:[{type:'public-key',id:unb64(meta.bio)}],userVerification:'required',timeout:60000}}).then(()=>true,()=>false)}catch(e){return Promise.resolve(false)}
+}
+function tryBio(){bioAuth().then(ok=>{if(ok)unlock()})}
+function lock(){if(!meta.pin)return;document.body.classList.add('locked');document.getElementById('lb').style.display=meta.bio?'inline-block':'none';if(meta.bio)tryBio();const l=document.getElementById('lk');l.hidden=false;document.getElementById('lp').value='';document.getElementById('le').textContent='';document.getElementById('lf').textContent='Forgot PIN?';fArm=false;document.getElementById('lp').focus()}
+function unlock(){document.body.classList.remove('locked');document.getElementById('lk').hidden=true}
+function tryUnlock(){sha((meta.salt||'')+document.getElementById('lp').value).then(h=>{if(h===meta.pin)unlock();else{document.getElementById('le').textContent='That PIN isn’t right.';document.getElementById('lp').value=''}})}
+function showSetup(){document.body.classList.add('locked');document.getElementById('su').hidden=false;document.getElementById('sbr').style.display=canBio?'flex':'none'}
+function finishSetup(){meta.setup=true;saveMeta();document.getElementById('su').hidden=true;document.body.classList.remove('locked');render()}
+document.getElementById('lb').onclick=tryBio;
+document.getElementById('lu').onclick=tryUnlock;
+document.getElementById('lp').addEventListener('keydown',e=>{if(e.key==='Enter')tryUnlock()});
+document.getElementById('lf').onclick=function(){
+ if(!fArm){fArm=true;this.textContent='This erases all data on this device. Tap again to confirm.';return}
+ data={};cfg=clone(DEF);meta={};save();saveCfg();saveMeta();unlock();view='day';render();showSetup();
+};
+document.getElementById('sk').onclick=finishSetup;
+document.getElementById('ss').onclick=function(){
+ const p=document.getElementById('sp').value,c=document.getElementById('sc').value,e=document.getElementById('se'),wb=document.getElementById('sb').checked;
+ if(!/^\d{4,6}$/.test(p)){e.textContent='Use 4 to 6 digits.';return}
+ if(p!==c){e.textContent='The two PINs don’t match.';return}
+ const salt=uid();
+ sha(salt+p).then(h=>{meta.salt=salt;meta.pin=h;saveMeta();
+  if(!wb){finishSetup();return}
+  bioEnroll().then(ok=>{if(!ok)flash='PIN set. Face ID or fingerprint isn’t available here, so your PIN will be used.';finishSetup()});
+ });
+};
+['sp','sc'].forEach(id=>document.getElementById(id).addEventListener('keydown',e=>{if(e.key==='Enter')document.getElementById('ss').onclick()}));
+function rollover(){const t=today();if(t!==lastToday){if(day===lastToday)day=t;lastToday=t;if(view==='day')render()}}
+document.addEventListener('visibilitychange',()=>{
+ if(document.hidden){hidAt=Date.now();touch();return}
+ if(meta.pin&&hidAt&&Date.now()-hidAt>=(meta.delay==null?1:meta.delay)*60000)lock();
+ else touch();
+ rollover();
+});
+function touch(){if(document.body.classList.contains('locked'))return;meta.ls=Date.now();saveMeta()}
+setInterval(rollover,60000);setInterval(touch,30000);
+document.addEventListener('input',e=>{
+ const t=e.target,k=t.getAttribute('data-k');
+ if(t.getAttribute('data-g')){const gk=t.getAttribute('data-g');cfg.sections.forEach(s=>s.items.forEach(i=>{if(i.id===gk)i.g=t.value}));saveCfg();return}
+ if(t.id==='pd'){meta.delay=+t.value;saveMeta();return}
+ if(t.getAttribute('data-po')){po=t.value;render();return}
+ if(k){cur()[k]=t.type==='checkbox'?t.checked:t.value;save();if(view==='day')prog();return}
+ const st=t.getAttribute('data-st'),it=t.getAttribute('data-it'),op=t.getAttribute('data-op');
+ if(st!==null){cfg.sections[+st].title=t.value;saveCfg()}
+ else if(it){const p=it.split(',');cfg.sections[+p[0]].items[+p[1]].label=t.value;saveCfg()}
+ else if(op){const p=op.split(',');cfg.sections[+p[0]].items[+p[1]].o=t.value.split(',').map(x=>x.trim()).filter(Boolean);saveCfg()}
+});
+function shareText(t){if(navigator.share)navigator.share({text:t}).catch(()=>{});else say('Sharing isn’t available here. Use Copy instead.')}
+document.addEventListener('click',e=>{
+ const el=e.target.closest?e.target.closest('[data-a]'):null;if(!el||el.id==='lu')return;
+ const a=el.getAttribute('data-a'),p=a.split(','),c=p[0],d=cur();let k,o;
+ if(c==='tab'){view=p[1];lf='';armed='';note='';render();window.scrollTo(0,0);return}
+ if(c==='shift'){const nd=addDays(day,+p[1]);if(nd<=today()){day=nd;render()}return}
+ if(c==='today'){day=today();render();return}
+ if(c==='open'){day=p[1];view='day';render();window.scrollTo(0,0);return}
+ if(c==='ent'){entryKey=p[1];view='entry';render();window.scrollTo(0,0);return}
+ if(c==='wb'){meta.wb=today();saveMeta();render();return}
+ if(c==='lm'){view='learn';lf='day';armed='';render();const el=document.getElementById('lm-'+p[1]);if(el){el.scrollIntoView({behavior:'smooth',block:'start'});el.style.outline='3px solid var(--acc)';el.style.outlineOffset='2px'}else window.scrollTo(0,0);return}
+ if(c==='hi'){meta.hi=true;saveMeta();render();return}
+ if(c==='fin'){const first=!d._done;d._done=Date.now();save();entryKey=day;view='entry';flash='★ Saved to your journal. Well done for showing up today.';const n=finished();if(first&&MS[n])flash+=' '+MS[n];render();window.scrollTo(0,0);return}
+ if(c==='shd'){shareText(dayText(p[1]));return}
+ if(c==='rng'){rng=+p[1];render();return}
+ if(c==='sc'){k=p[1];const v=+p[2];d[k]=d[k]===v?'':v;save();render();return}
+ if(c==='pa'){k=p[1];const v=document.getElementById('p'+k).value;if(!Array.isArray(d[k]))d[k]=[];if(v&&d[k].indexOf(v)<0)d[k].push(v);save();render();return}
+ if(c==='px'){d[p[1]].splice(+p[2],1);save();render();return}
+ if(c==='la'){k=p[1];const w=document.getElementById('w'+k).value.trim();if(!w){document.getElementById('w'+k).focus();return}
+  if(!Array.isArray(d[k]))d[k]=[];d[k].push({what:w,lvl:document.getElementById('l'+k).value,did:document.getElementById('d'+k).value.trim()});save();render();return}
+ if(c==='rm'){d[p[1]].splice(+p[2],1);save();render();return}
+ if(c==='gen'){
+  const n=+document.getElementById('xr').value,out=document.getElementById('ot');
+  if(p[1]==='sum'){out.value=summary(n);say('Ready to copy or share.')}
+  else if(p[1]==='csv'){out.value=csv(n);say('Ready to copy or share.')}
+  else{const pw=document.getElementById('pp').value;if(pw.length<8){say('Enter a passphrase of 8 or more characters first.');return}
+   if(!(window.crypto&&crypto.subtle)){say('Encryption isn’t available in this browser.');return}
+   say('Encrypting…');encText(pw,JSON.stringify({v:1,cfg:cfg,data:data})).then(t=>{out.value=t;say('Encrypted. Copy it somewhere safe, and remember your passphrase.')},()=>say('Encryption failed.'))}
+  return}
+ if(c==='cp'){o=document.getElementById('ot');if(!o.value){say('Make a summary, spreadsheet or backup first.');return}markBackup(o.value);
+  const ok=r=>say(r?'Copied.':'Couldn’t copy automatically. Select the text and copy it.');
+  try{navigator.clipboard.writeText(o.value).then(()=>ok(true),()=>ok(fb()))}catch(x){ok(fb())}return}
+ if(c==='sh'){o=document.getElementById('ot');if(!o.value){say('Make a summary, spreadsheet or backup first.');return}markBackup(o.value);shareText(o.value);return}
+ if(c==='im'){
+  const tv=document.getElementById('ot').value,pw=document.getElementById('pp').value;
+  if(armed!=='im'){armed='im';render();document.getElementById('ot').value=tv;document.getElementById('pp').value=pw;say('Tap again to replace everything on this device.');return}
+  armed='';
+  (tv.trim().indexOf('dci1:')===0?decText(pw,tv):Promise.resolve(tv)).then(t=>JSON.parse(t)).then(b=>{if(!b.cfg||!b.cfg.sections||typeof b.data!=='object')throw 0;cfg=b.cfg;data=b.data;save();saveCfg();note='Backup imported.';render()}).catch(()=>{note='Couldn’t read that backup. Check the passphrase and that you pasted all of the text.';render()});
+  return}
+ if(c==='ps'){const pin=document.getElementById('pn').value;if(!/^\d{4,6}$/.test(pin)){say('Use 4 to 6 digits.');return}
+  const salt=uid();sha(salt+pin).then(h=>{meta.salt=salt;meta.pin=h;saveMeta();note='PIN saved.';render()});return}
+ if(c==='bn'){bioEnroll().then(ok=>{note=ok?'Face ID or fingerprint is on.':'Face ID or fingerprint isn’t available here.';render()});return}
+ if(c==='bo'){delete meta.bio;saveMeta();note='Turned off.';render();return}
+ if(c==='ms'){mv(cfg.sections,+p[1],+p[2]);armed=''}
+ else if(c==='mi'){mv(cfg.sections[+p[1]].items,+p[2],+p[3]);armed=''}
+ else if(c==='ds'||c==='di'||c==='rs'||c==='pr'){
+  if(armed!==a){armed=a;render();return}
+  armed='';
+  if(c==='ds')cfg.sections.splice(+p[1],1);else if(c==='di')cfg.sections[+p[1]].items.splice(+p[2],1);else if(c==='rs')cfg=clone(DEF);else{delete meta.pin;delete meta.salt;delete meta.bio;saveMeta();note='Lock turned off.'}
+ }
+ else if(c==='ai'){const si=+p[1],nm=document.getElementById('ni'+si).value.trim();if(!nm){document.getElementById('ni'+si).focus();return}
+  const ty=document.getElementById('nt'+si).value,it={id:uid(),label:nm,type:ty};
+  if(ty==='pick')it.o=['Option 1','Option 2'];if(ty==='log')it.p=LP;cfg.sections[si].items.push(it)}
+ else if(c==='as'){const sn=document.getElementById('ns').value.trim();if(!sn){document.getElementById('ns').focus();return}
+  const ls=document.getElementById('nl').value.split('\n').map(x=>x.trim()).filter(Boolean);
+  cfg.sections.push({id:uid(),title:sn,items:ls.map(x=>({id:uid(),label:x,type:'check'}))})}
+ else return;
+ saveCfg();render();
+});
+try{if(navigator.storage&&navigator.storage.persist)navigator.storage.persist().catch(()=>{})}catch(e){}
+render();if(meta.pin&&Date.now()-(meta.ls||0)>=(meta.delay==null?1:meta.delay)*60000)lock();touch();if(!meta.pin&&!meta.setup)showSetup();
+</script>
+</body>
+</html>
