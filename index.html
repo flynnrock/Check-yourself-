@@ -73,17 +73,18 @@ input[type=checkbox]{width:26px;height:26px;accent-color:var(--acc);flex:none}
 .lc{width:100%;max-width:320px;text-align:center}
 .fab{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(16px + env(safe-area-inset-bottom,0px));z-index:5;background:var(--ink);color:var(--bg);border:0;border-radius:24px;padding:13px 22px;font:inherit;font-weight:700;box-shadow:0 4px 14px rgba(0,0,0,.28);cursor:pointer}
 ul.pts{padding-left:20px;margin:6px 0}ul.pts li{margin-bottom:6px}
+.pin{-webkit-text-security:disc;text-security:disc}
 button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible,a:focus-visible{outline:3px solid var(--acc);outline-offset:2px}
 footer{color:var(--mute);font-size:14px;text-align:center;margin-top:8px}
 </style>
 </head>
 <body>
 <div class="lock" id="su" hidden>
- <div class="lc"><h2 style="justify-content:center">Protect your check-ins</h2><p class="hint">Choose a PIN so only you can open this app. You can change it later under More, then Edit.</p><label for="sp">PIN (4 to 6 digits)</label><input id="sp" class="full" type="password" inputmode="numeric" maxlength="6" autocomplete="off"><label for="sc">Confirm PIN</label><input id="sc" class="full" type="password" inputmode="numeric" maxlength="6" autocomplete="off"><div id="sbr" style="display:none;align-items:center;gap:10px;margin-top:12px;text-align:left"><input type="checkbox" id="sb"><label for="sb">Also unlock with Face ID or fingerprint</label></div><button class="add" id="ss">Set PIN</button><div class="hint" id="se" role="alert"></div><p><button class="sm" id="sk">Skip for now</button></p></div>
+ <div class="lc"><h2 style="justify-content:center">Protect your check-ins</h2><p class="hint">Choose a PIN so only you can open this app. You can change it later under More, then Edit.</p><label for="sp">PIN (4 to 6 digits)</label><input id="sp" class="full pin" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="6" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false"><label for="sc">Confirm PIN</label><input id="sc" class="full pin" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="6" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false"><div id="sbr" style="display:none;align-items:center;gap:10px;margin-top:12px;text-align:left"><input type="checkbox" id="sb"><label for="sb">Also unlock with Face ID or fingerprint</label></div><button class="add" id="ss">Set PIN</button><div class="hint" id="se" role="alert"></div><p><button class="sm" id="sk">Skip for now</button></p></div>
 </div>
 <div class="lock" id="lk" hidden>
  <div class="lc"><h2 style="justify-content:center">Daily check-in</h2><button class="add" id="lb" style="display:none">Unlock with Face ID or fingerprint</button><br><label for="lp">Enter your PIN</label>
- <input id="lp" class="full" type="password" inputmode="numeric" maxlength="6" autocomplete="off">
+ <input id="lp" class="full pin" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="6" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false">
  <button class="add" id="lu">Unlock</button><div class="hint" id="le" role="alert"></div>
  <p><button class="sm" id="lf">Forgot PIN?</button></p></div>
 </div>
@@ -91,7 +92,7 @@ footer{color:var(--mute);font-size:14px;text-align:center;margin-top:8px}
 <h1>Daily check-in</h1>
 <nav id="tb" aria-label="Sections"></nav>
 <div id="app"></div>
-<footer>Saved on this device only. If you’re in crisis, call or text 988 (US) or contact your local emergency services.</footer>
+<footer>Saved on this device only. If you’re in crisis, call Samaritans free on 116 123 (UK) or 988 (US), or contact your local emergency services (999 in the UK).</footer>
 </main>
 <script>
 'use strict';
@@ -110,8 +111,8 @@ mind:{t:'Mindfulness',short:'Mindfulness may help with anxiety, depression and r
  pts:['The US National Center for Complementary and Integrative Health says mindfulness-based practices may help anxiety and depression, may reduce insomnia, and may help people recover from substance use disorders.','It’s usually considered low risk, but some people have unpleasant experiences. If you have a mental or physical health condition, talk to your health care provider before starting.','Short guided practices of one to five minutes are a gentle way to begin.'],
  src:[['NCCIH: 8 things to know about meditation and mindfulness','https://www.nccih.nih.gov/health/tips/8-things-to-know-about-meditation-and-mindfulness'],['NHS Lanarkshire: short mindfulness practices','https://www.nhslanarkshire.scot.nhs.uk/services/mindfulness/']]},
 help:{t:'Addiction and recovery support',short:'Any addiction affects mental health. Support is free and confidential.',
- pts:['Anything can go here: alcohol, drugs, gambling, nicotine, food, screens. What matters is noticing patterns and asking for help.','US: SAMHSA’s National Helpline is free, confidential and open 24/7 on 1-800-662-4357, for mental health and substance use.','UK: FRANK gives free, confidential drug and alcohol advice on 0300 123 6600, 24 hours a day.','If you’re in danger, or may have taken too much of something, call your local emergency number straight away.'],
- src:[['SAMHSA National Helpline (US)','https://www.samhsa.gov/find-help/helplines/national-helpline'],['FRANK (UK)','https://www.talktofrank.com/']]},
+ pts:['Anything can go here: alcohol, drugs, gambling, nicotine, food, screens. What matters is noticing patterns and asking for help.','UK: FRANK gives free, confidential drug and alcohol advice on 0300 123 6600, 24 hours a day. Samaritans (116 123) is free to call from any phone, day or night, if you need to talk to someone.','US: SAMHSA’s National Helpline is free, confidential and open 24/7 on 1-800-662-4357, for mental health and substance use.','If you’re in danger, or may have taken too much of something, call your local emergency number straight away.'],
+ src:[['FRANK (UK)','https://www.talktofrank.com/'],['Samaritans (UK)','https://www.samaritans.org/how-we-can-help/contact-samaritan/talk-us-phone/'],['SAMHSA National Helpline (US)','https://www.samhsa.gov/find-help/helplines/national-helpline']]},
 relapse:{t:'Relapse prevention: early warning signs',short:'Relapse is usually gradual. Noticing early signs gives you time to act. Noticing one is useful, not a failure.',
  pts:['A 2015 clinical overview describes relapse as a gradual process in three stages: emotional (for example isolating, bottling up feelings, skipping support, poor sleep and eating), mental (cravings, bargaining, planning) and physical (using again). The aim is to spot the early stage, when acting is easiest.','The author’s HALT reminder: check whether you’re hungry, angry, lonely or tired. Basic self-care often slips first.','Five rules the author suggests: change your life so it’s easier not to use, be honest with people you trust, ask for help, look after yourself, and don’t look for loopholes.','Setbacks are common and fixable. Treating one as proof you’ve failed can make things worse, so look for what to change instead.','This is one clinician’s perspective, based mainly on experience and written for use in therapy. Some parts cite trials, for example on early-warning-sign training and mindfulness-based relapse prevention, but it isn’t a systematic review. It doesn’t replace professional care.'],
  src:[['Melemis 2015, Yale Journal of Biology and Medicine','https://pmc.ncbi.nlm.nih.gov/articles/PMC4553654/']]},
@@ -122,7 +123,7 @@ water:{t:'Water and hydration',short:'',
 const MS={1:'Your first check-in. Showing up is the hardest part, and you did it.',7:'Seven check-ins: a full week of paying attention to yourself. Well done.',14:'Two weeks’ worth of check-ins. You’re building something steady.',30:'Thirty check-ins, a month’s worth of honest showing up. That takes real commitment.',60:'Sixty check-ins. Two months of looking after yourself, one day at a time.',100:'One hundred check-ins. Look how far your attention has taken you.',180:'Half a year’s worth of check-ins. That’s something to be proud of.',365:'A full year’s worth of check-ins. That’s extraordinary. Be proud of yourself.',500:'Five hundred check-ins. Your commitment to yourself keeps showing.',730:'Two years’ worth of check-ins. Thank you for caring for yourself so consistently.',1000:'One thousand check-ins. What an achievement. You should be very proud.'};
 const DEF={sections:[
 {id:'s2',title:'Morning',items:[{id:'moodAm',label:'Morning mood',type:'scale'},{id:'sleep',label:'Sleep last night (hours)',type:'num'},{id:'up',label:'Time up',type:'time'},{id:'meds',label:'Meds taken',type:'check'}]},
-{id:'s3',title:'Food and snacks',info:'gut',items:[{id:'bkf',label:'Breakfast',type:'check'},{id:'lunch',label:'Lunch',type:'check'},{id:'dinner',label:'Dinner',type:'check'},{id:'snk',label:'Snacks, sweets and junk food',type:'log',p:['What did you eat or drink?','How much (1–5)','How did I feel afterwards? (optional)']}]},
+{id:'s3',title:'Food and snacks',info:'gut',items:[{id:'bkf',label:'Breakfast',type:'check'},{id:'lunch',label:'Lunch',type:'check'},{id:'dinner',label:'Dinner',type:'check'},{id:'snk',label:'Snacks, sweets and junk food',type:'log',p:['What did you eat or drink?','Portion size (1 = small, 5 = large)','How did I feel afterwards? (optional)'],u:'portion'}]},
 {id:'s1',title:'Afternoon check-in',items:[{id:'moodMid',label:'Afternoon mood',type:'scale'},{id:'moodWhy',label:'What’s affecting my mood today?',type:'text'}]},
 {id:'s4',title:'Mood helpers',info:'five',items:[{id:'outside',label:'Went outside',type:'check'},{id:'gym',label:'Exercise or movement',type:'check'},{id:'water',label:'Cups of water today',type:'num',g:6,h:'A common guide for adults is about 6 to 8 cups or glasses of fluid a day. Water, tea, coffee and lower-fat milk all count. You may need more when it’s hot, you’re active or unwell. Set a goal that suits you, and check with a doctor or pharmacist if you’re unsure, especially if you have a health condition or take medication.'},{id:'chores',label:'Kept on top of chores',type:'check'},{id:'reach',label:'Connected with someone',type:'check'}]},
 {id:'s5',title:'Activities',items:[{id:'acts',label:'What I did today',type:'pick',o:['Walk','Run','Gym','Yoga or stretching','Cycling','Swimming','Cooking','Reading','Creative hobby','Time with friends or family','Meditation or mindfulness','Therapy or support group','Volunteering','Work','Rest','Other']},{id:'actMin',label:'Active time (minutes)',type:'num'},{id:'work',label:'Work (hours)',type:'num'},{id:'tv',label:'TV or screen time (hours)',type:'num'}]},
@@ -139,6 +140,7 @@ let data=ld(KEY,{}),cfg=ld(CK,null),meta=ld(MK,{}),view='day',armed='',note='',r
 if(!cfg||!cfg.sections)cfg=clone(DEF);
 let mig=false;cfg.sections.forEach(s=>s.items.forEach((i,ix)=>{if(i.id==='water'&&i.type==='check'){s.items[ix]=JSON.parse(JSON.stringify(WATER));mig=true}}));
 if(!meta.ew){if(!cfg.sections.some(x=>x.id==='s9')){const at=cfg.sections.findIndex(x=>x.id==='s6');cfg.sections.splice(at>=0?at+1:cfg.sections.length,0,JSON.parse(JSON.stringify(DEF.sections.filter(x=>x.id==='s9')[0])))}meta.ew=true;saveMeta();saveCfg()}
+cfg.sections.forEach(s=>s.items.forEach(i=>{if(i.id==='snk'&&i.p&&i.p[1]==='How much (1–5)'){i.p[1]='Portion size (1 = small, 5 = large)';i.u='portion';saveCfg()}}));
 if(mig){saveCfg();Object.keys(data).forEach(k=>{if(data[k]&&data[k].water===true)data[k].water=''});save()}
 function save(){sv(KEY,data)}function saveCfg(){sv(CK,cfg)}function saveMeta(){sv(MK,meta)}
 function iso(d){const z=new Date(d.getTime()-d.getTimezoneOffset()*6e4);return z.toISOString().slice(0,10)}
@@ -156,8 +158,8 @@ function done(d,ck){return ck.filter(k=>d&&d[k]===true).length}
 function finished(){return Object.keys(data).filter(k=>data[k]&&data[k]._done).length}
 function nextMs(n){return Object.keys(MS).map(Number).filter(x=>x>n).sort((x,y)=>x-y)[0]}
 function avg(a){return a.reduce((x,y)=>x+y,0)/a.length}
-function logOne(c){return c.what+' ('+c.lvl+'/5)'+(c.did?', '+c.did:'')}
-function logTxt(v){return (Array.isArray(v)?v:[]).map(logOne).join('; ')}
+function logOne(c,u){return c.what+' ('+(u?u+' ':'')+c.lvl+'/5)'+(c.did?', '+c.did:'')}
+function logTxt(v,u){return (Array.isArray(v)?v:[]).map(c=>logOne(c,u)).join('; ')}
 function link(l){return '<a href="'+l[1]+'" target="_blank" rel="noopener noreferrer">'+l[0]+'</a>'}
 function field(f,d){
  const k=f.id,l=esc(f.label),v=d[k],t=f.type;
@@ -167,7 +169,7 @@ function field(f,d){
  if(t==='text')return `<div class="col"><label for="${k}">${l}</label><textarea id="${k}" data-k="${k}">${esc(v)}</textarea></div>`;
  if(t==='scale'){let b='';for(let i=1;i<=5;i++)b+=`<button type="button" data-a="sc,${k},${i}" class="${v==i?'on':''}" aria-pressed="${v==i}">${i}</button>`;return `<div class="col"><div>${l} <span class="hint">1 low, 5 good</span></div><div class="scale">${b}</div></div>`}
  if(t==='pick'){const sel=Array.isArray(v)?v:[];return `<div class="col"><h3>${l}</h3><div class="row" style="border:0;padding:0"><select id="p${k}" aria-label="${l}">${(f.o||[]).map(x=>`<option>${esc(x)}</option>`).join('')}</select><button class="add" style="margin:0" data-a="pa,${k}">Add</button></div><div class="chips">${sel.map((x,i)=>`<button class="chip" data-a="px,${k},${i}" aria-label="Remove ${esc(x)}">${esc(x)} ×</button>`).join('')}</div></div>`}
- const p=f.p||LP,list=(Array.isArray(v)?v:[]).map((c,i)=>`<div class="log"><div><b>${esc(c.lvl)}/5</b> ${esc(c.what)}${c.did?`<br><span class="hint">${esc(c.did)}</span>`:''}</div><button data-a="rm,${k},${i}" aria-label="Remove entry">×</button></div>`).join('');
+ const p=f.p||LP,list=(Array.isArray(v)?v:[]).map((c,i)=>`<div class="log"><div><b>${f.u?esc(f.u)+' ':''}${esc(c.lvl)}/5</b> ${esc(c.what)}${c.did?`<br><span class="hint">${esc(c.did)}</span>`:''}</div><button data-a="rm,${k},${i}" aria-label="Remove entry">×</button></div>`).join('');
  return `<div class="col"><h3>${l}</h3><label for="w${k}">${esc(p[0])}</label><input type="text" class="full" id="w${k}"><div class="row" style="border:0;padding-bottom:0"><label for="l${k}">${esc(p[1])}</label><select id="l${k}"><option>1</option><option>2</option><option selected>3</option><option>4</option><option>5</option></select></div><label for="d${k}">${esc(p[2])}</label><input type="text" class="full" id="d${k}"><button class="add" data-a="la,${k}">Add entry</button>${list}</div>`;
 }
 function dayView(){
@@ -203,7 +205,7 @@ function dayLines(k){
   s.items.forEach(i=>{const v=d[i.id];
    if(i.type==='check'){if(i.neg){if(v===true)wn.push(i.label)}else(v===true?on:off).push(i.label)}
    else if(i.type==='scale'){if(v)L.push(i.label+': '+v+'/5')}
-   else if(i.type==='log'){if(Array.isArray(v)&&v.length)L.push(i.label+':\n'+v.map(c=>'  - '+logOne(c)).join('\n'))}
+   else if(i.type==='log'){if(Array.isArray(v)&&v.length)L.push(i.label+':\n'+v.map(c=>'  - '+logOne(c,i.u)).join('\n'))}
    else if(i.type==='pick'){if(Array.isArray(v)&&v.length)L.push(i.label+': '+v.join(', '))}
    else if(v!==undefined&&v!==''&&v!==null)L.push(i.label+': '+v);
   });
@@ -259,7 +261,7 @@ function learnView(){
 }
 function moreView(){
  const r=(a,t,s)=>`<button class="hrow" data-a="tab,${a}"><span><b>${t}</b><br><span class="hint">${s}</span></span><span>›</span></button>`;
- return r('export','Export and backup','Summaries, spreadsheet, encrypted backup')+r('edit','Edit layout and lock','Change sections, checklists, PIN')+r('about','About and help','Privacy, purpose, support lines')+(TIP_URL?`<a class="hrow" style="text-decoration:none" href="${TIP_URL}" target="_blank" rel="noopener noreferrer"><span><b>Leave a tip</b><br><span class="hint">The app is free. Tips are optional.</span></span><span>›</span></a>`:'');
+ return r('export','Export and backup','Summaries, spreadsheet, encrypted backup')+r('edit','Edit layout and lock','Change sections, checklists, PIN')+r('about','About and help','Privacy, purpose, support lines')+`<button class="hrow" data-a="share"><span><b>Share this app</b><br><span class="hint">Send the link to a friend</span></span><span>›</span></button>`+(TIP_URL?`<a class="hrow" style="text-decoration:none" href="${TIP_URL}" target="_blank" rel="noopener noreferrer"><span><b>Leave a tip</b><br><span class="hint">The app is free. Tips are optional.</span></span><span>›</span></a>`:'');
 }
 function aboutView(){
  return `<button class="sm" style="margin-bottom:10px" data-a="tab,more">‹ More</button>
@@ -268,14 +270,15 @@ function aboutView(){
 <section><h2>Your privacy</h2><ul class="pts"><li>Your entries stay on this device. There are no accounts, no tracking and no data sent anywhere.</li><li>The PIN hides the app. It doesn’t encrypt what’s stored.</li><li>Backups are encrypted with a passphrase you choose, so it’s safe to keep them in cloud notes or email when you change device. If you lose the passphrase, the backup can’t be opened.</li><li>If you clear your browser data or lose your device without a backup, your entries are gone.</li></ul></section>
 <section><h2>Stars and milestones</h2><p>Finishing a day earns a star, whatever that day held, including days with a slip. Milestones count your total check-ins, so a missed day never resets your progress. If you’ve been away a few days, the app welcomes you back without any guilt.</p></section>
 <section><h2>Evidence</h2><p>Where a note makes a claim, it links to its source on the Learn tab. Some simple habits, like drinking water or doing chores, are tracked because they’re easy to count, not because we’ve cited a study for each.</p></section>
-<section><h2>Free, with an optional tip</h2><p>The app is free and always will be. ${TIP_URL?'If it helps you, you can leave a tip under More.':'A tip option will appear under More when it’s set up.'}</p></section>
-<section><h2>Need help now?</h2><p>US: call or text 988 for crisis support, or SAMHSA’s helpline on 1-800-662-4357 for substance use and mental health. UK: FRANK on 0300 123 6600. If you’re in danger, call your local emergency number.</p></section>
+<section><h2>Free, with an optional tip</h2><p>The app is free and always will be. ${TIP_URL?'If it helps you, you can leave a tip under More.':'A tip option will appear under More when it’s set up.'}</p>${TIP_URL?`<p><a class="add" style="display:inline-block;text-decoration:none" href="${TIP_URL}" target="_blank" rel="noopener noreferrer">Leave a tip</a></p>`:''}</section>
+<section><h2>Share it</h2><p>Know someone it could help? Use More, then Share this app. Each person’s entries stay on their own phone, and nobody can see anyone else’s.</p></section>
+<section><h2>Need help now?</h2><p>UK: Samaritans on 116 123 (free, any time) for emotional support, and FRANK on 0300 123 6600 for drug and alcohol advice. If you’re in danger, call 999. US: call or text 988 for crisis support, or SAMHSA’s helpline on 1-800-662-4357. Elsewhere, use your local emergency number.</p></section>
 <p class="hint">Version 2, October 2026</p>`;
 }
 function exportView(){
  return `<button class="sm" style="margin-bottom:10px" data-a="tab,more">‹ More</button><section><h2>Export and backup</h2><p class="hint">Summaries and spreadsheets are plain text, for sharing with a therapist or doctor. Backups are encrypted with your passphrase.</p>
 <label for="xr">Days to include</label> <select id="xr"><option value="7">Last 7</option><option value="30" selected>Last 30</option><option value="90">Last 90</option><option value="0">Everything</option></select>
-<label for="pp" style="display:block;margin-top:10px">Passphrase for backups (8 or more characters)</label><input type="password" class="full" id="pp" autocomplete="off">
+<label for="pp" style="display:block;margin-top:10px">Passphrase for backups (8 or more characters)</label><input type="text" class="full pin" id="pp" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false">
 <div class="row" style="border:0;flex-wrap:wrap"><button class="add" style="margin:0" data-a="gen,sum">Summary</button><button class="add" style="margin:0" data-a="gen,csv">Spreadsheet</button><button class="add" style="margin:0" data-a="gen,bk">Encrypted backup</button></div>
 <textarea id="ot" style="min-height:140px" aria-label="Export text"></textarea>
 <div class="row" style="border:0;flex-wrap:wrap"><button class="sm" data-a="cp">Copy</button><button class="sm" data-a="sh">Share</button><button class="sm${armed==='im'?' del':''}" data-a="im">${armed==='im'?'Replace my data?':'Import pasted backup'}</button></div>
@@ -295,7 +298,7 @@ function editView(){
   h+=`<div class="col"><input type="text" class="full" id="ni${si}" placeholder="New item name"><div class="row" style="border:0;padding-bottom:0"><select id="nt${si}" aria-label="Item type">${opts()}</select><button class="add" style="margin:0" data-a="ai,${si}">Add item</button></div></div></section>`;
  });
  h+='<section><h2>New section or checklist</h2><input type="text" class="full" id="ns" placeholder="Name, for example Before I go out"><textarea id="nl" placeholder="Checklist items, one per line (optional)"></textarea><button class="add" data-a="as">Add section</button></section>';
- h+=`<section><h2>Privacy lock</h2><p class="hint">${meta.pin?'A PIN is set. The app asks for it if you’ve been away longer than the time you choose below.':'Ask for a PIN if you’ve been away from the app longer than the time you choose below.'} This hides your entries on this device. It doesn’t encrypt them.</p><label for="pd">Ask for the PIN after being away for</label><select id="pd" style="margin:6px 0 12px;display:block">${delayOpts()}</select><label for="pn">${meta.pin?'New PIN':'PIN'} (4 to 6 digits)</label><input type="password" inputmode="numeric" maxlength="6" class="full" id="pn" autocomplete="off"><div class="row" style="border:0"><button class="add" style="margin:0" data-a="ps">${meta.pin?'Change PIN':'Set PIN'}</button>${meta.pin?btn('del','Turn off','pr','Turn off lock'):''}</div>${meta.pin&&canBio?`<div class="row" style="border:0"><span>Face ID or fingerprint</span>${meta.bio?'<button class="sm" data-a="bo">Turn off</button>':'<button class="sm" data-a="bn">Turn on</button>'}</div>`:''}<div class="hint" id="st">${esc(note)}</div></section>`;
+ h+=`<section><h2>Privacy lock</h2><p class="hint">${meta.pin?'A PIN is set. The app asks for it if you’ve been away longer than the time you choose below.':'Ask for a PIN if you’ve been away from the app longer than the time you choose below.'} This hides your entries on this device. It doesn’t encrypt them.</p><label for="pd">Ask for the PIN after being away for</label><select id="pd" style="margin:6px 0 12px;display:block">${delayOpts()}</select><label for="pn">${meta.pin?'New PIN':'PIN'} (4 to 6 digits)</label><input type="text" inputmode="numeric" pattern="[0-9]*" maxlength="6" class="full pin" id="pn" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false"><div class="row" style="border:0"><button class="add" style="margin:0" data-a="ps">${meta.pin?'Change PIN':'Set PIN'}</button>${meta.pin?btn('del','Turn off','pr','Turn off lock'):''}</div>${meta.pin&&canBio?`<div class="row" style="border:0"><span>Face ID or fingerprint</span>${meta.bio?'<button class="sm" data-a="bo">Turn off</button>':'<button class="sm" data-a="bn">Turn on</button>'}</div>`:''}<div class="hint" id="st">${esc(note)}</div></section>`;
  return h+`<section><div class="row"><span>Restore the starter layout</span>${btn('del','Reset','rs','Reset layout')}</div></section>`;
 }
 function render(){
@@ -316,7 +319,7 @@ function summary(n){
   const vals=ks.map(k=>data[k][it.id]);
   if(it.type==='check')L.push('- '+it.label+': '+vals.filter(v=>v===true).length+' of '+ks.length+' days');
   else if(it.type==='num'||it.type==='scale'){const x=vals.map(parseFloat).filter(v=>!isNaN(v));L.push('- '+it.label+': '+(x.length?'average '+avg(x).toFixed(1)+' over '+x.length+' days':'no entries'))}
-  else if(it.type==='log'){let c=0;vals.forEach(v=>{if(Array.isArray(v))c+=v.length});L.push('- '+it.label+': '+c+' entries');ks.forEach(k=>{const t=logTxt(data[k][it.id]);if(t)L.push('    '+k+': '+t)})}
+  else if(it.type==='log'){let c=0;vals.forEach(v=>{if(Array.isArray(v))c+=v.length});L.push('- '+it.label+': '+c+' entries');ks.forEach(k=>{const t=logTxt(data[k][it.id],it.u);if(t)L.push('    '+k+': '+t)})}
   else if(it.type==='pick'){const m={};vals.forEach(v=>{if(Array.isArray(v))v.forEach(x=>m[x]=(m[x]||0)+1)});L.push('- '+it.label+': '+(Object.keys(m).map(x=>x+' '+m[x]).join(', ')||'no entries'))}
   else L.push('- '+it.label+': '+vals.filter(v=>v).length+' entries');
  });L.push('')});
@@ -325,7 +328,7 @@ function summary(n){
 function csv(n){
  const its=[];cfg.sections.forEach(s=>s.items.forEach(i=>its.push(i)));
  const r=[['Date'].concat(its.map(i=>i.label)).map(q).join(',')];
- days(n).forEach(k=>r.push([k].concat(its.map(i=>{const v=data[k][i.id];return i.type==='check'?(v===true?'Yes':''):i.type==='log'?logTxt(v):i.type==='pick'?(Array.isArray(v)?v.join('; '):''):v})).map(q).join(',')));
+ days(n).forEach(k=>r.push([k].concat(its.map(i=>{const v=data[k][i.id];return i.type==='check'?(v===true?'Yes':''):i.type==='log'?logTxt(v,i.u):i.type==='pick'?(Array.isArray(v)?v.join('; '):''):v})).map(q).join(',')));
  return r.join('\n');
 }
 function fb(){const o=document.getElementById('ot');o.focus();o.select();try{return document.execCommand('copy')}catch(e){return false}}
@@ -405,6 +408,7 @@ document.addEventListener('click',e=>{
  if(c==='open'){day=p[1];view='day';render();window.scrollTo(0,0);return}
  if(c==='ent'){entryKey=p[1];view='entry';render();window.scrollTo(0,0);return}
  if(c==='wb'){meta.wb=today();saveMeta();render();return}
+ if(c==='share'){const u=location.href.split('#')[0];if(navigator.share)navigator.share({title:'Daily check-in',text:'A free, private daily check-in for mental health and habits. Your data stays on your phone.',url:u}).catch(()=>{});else if(navigator.clipboard)navigator.clipboard.writeText(u).then(()=>{flash='Link copied.';render()},()=>{});return}
  if(c==='lm'){view='learn';lf='day';armed='';render();const el=document.getElementById('lm-'+p[1]);if(el){el.scrollIntoView({behavior:'smooth',block:'start'});el.style.outline='3px solid var(--acc)';el.style.outlineOffset='2px'}else window.scrollTo(0,0);return}
  if(c==='hi'){meta.hi=true;saveMeta();render();return}
  if(c==='fin'){const first=!d._done;d._done=Date.now();save();entryKey=day;view='entry';flash='★ Saved to your journal. Well done for showing up today.';const n=finished();if(first&&MS[n])flash+=' '+MS[n];render();window.scrollTo(0,0);return}
